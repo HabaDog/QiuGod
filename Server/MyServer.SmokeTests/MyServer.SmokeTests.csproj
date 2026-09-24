@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MyServer\MyServer.csproj" />
+    <Compile Include="..\..\Client\Assets\Scripts\ResourceManager\HotUpdateReleaseStore.cs" Link="HotUpdateReleaseStore.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\GameModules\ClientGameModuleRegistry.cs" Link="ClientGameModuleRegistry.cs" />
+  </ItemGroup>
+</Project>

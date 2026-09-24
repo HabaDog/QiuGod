@@ -1,0 +1,4 @@
+﻿[2026-01-09 11:08:59.305] BACKUP LOG: [GameLauncher] Screen orientation set to LandscapeLeft (Editor) (original error: Value cannot be null.
+Parameter name: path)
+[2026-01-09 11:21:15.006] BACKUP LOG: [GameLauncher] Screen orientation set to LandscapeLeft (Editor) (original error: Value cannot be null.
+Parameter name: path)

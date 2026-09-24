@@ -1,0 +1,694 @@
+syntax = "proto3";
+
+package mydemo.protocol;
+
+option csharp_namespace = "GameNetworkCommon";
+
+enum ProtocolId {
+  ProtocolIdUnknown = 0;
+
+  HeartbeatRequest = 1001;
+  HeartbeatResponse = 1002;
+  UdpBindRequest = 1003;
+  UdpBindResponse = 1004;
+
+  LoginRequest = 2001;
+  LoginResponse = 2002;
+  RegisterRequest = 2003;
+  RegisterResponse = 2004;
+  LogoutRequest = 2005;
+  LogoutResponse = 2006;
+  ResumeSessionRequest = 2007;
+  ResumeSessionResponse = 2008;
+
+  EnterRoomRequest = 3001;
+  EnterRoomResponse = 3002;
+  RoomStateUpdate = 3003;
+  ToggleReadyRequest = 3004;
+  ToggleReadyResponse = 3005;
+  StartGameRequest = 3006;
+  StartGameResponse = 3007;
+  GameStartNotification = 3008;
+  SelectGameModeRequest = 3009;
+  SelectGameModeResponse = 3010;
+  SelectGameThreeBallRequest = 3011;
+  SelectGameThreeBallResponse = 3012;
+  LobbySnapshotRequest = 3013;
+  LobbySnapshotResponse = 3014;
+  CreateRoomRequest = 3015;
+  CreateRoomResponse = 3016;
+  JoinRoomRequest = 3017;
+  JoinRoomResponse = 3018;
+  LeaveRoomRequest = 3019;
+  LeaveRoomResponse = 3020;
+  MatchmakingJoinRequest = 3021;
+  MatchmakingJoinResponse = 3022;
+  MatchmakingCancelRequest = 3023;
+  MatchmakingCancelResponse = 3024;
+  PartyCreateRequest = 3025;
+  PartyCreateResponse = 3026;
+  PartyJoinRequest = 3027;
+  PartyJoinResponse = 3028;
+  PartyLeaveRequest = 3029;
+  PartyLeaveResponse = 3030;
+  LobbyStateUpdate = 3031;
+  GameThreeBallSelectionStateUpdate = 3032;
+
+  PlayerMoveRequest = 4001;
+  PlayerMoveResponse = 4002;
+  PlayerMoveBroadcast = 4003;
+
+  GameThreeInput = 6001;
+  GameThreeThrowBombRequest = 6002;
+  GameThreeUseSkillRequest = 6003;
+  GameThreeStateSync = 6004;
+  GameThreeRoundStart = 6005;
+  GameThreeBombThrown = 6006;
+  GameThreeBombExploded = 6007;
+  GameThreePlayerDamaged = 6008;
+  GameThreePlayerDeath = 6009;
+  GameThreeTileClaimed = 6010;
+  GameThreePickupSpawned = 6011;
+  GameThreePickupCollected = 6012;
+  GameThreeGameOver = 6013;
+  GameThreeLeaveGame = 6014;
+  GameThreeLeaveGameResponse = 6015;
+  GameThreeSkillUsed = 6016;
+  GameThreeDashRequest = 6017;
+  GameThreeCancelBallSelectionRequest = 6018;
+}
+
+message LoginRequest {
+  string Username = 1;
+  string Password = 2;
+}
+
+message LoginResponse {
+  bool Success = 1;
+  int32 PlayerId = 2;
+  string Message = 3;
+  string SessionToken = 4;
+  bool IsInGame = 5;
+  int32 SlotIndex = 6;
+  int32 PlayerCount = 7;
+  string GameMode = 8;
+  string SceneName = 9;
+}
+
+message ResumeSessionRequest {
+  int32 PlayerId = 1;
+  string SessionToken = 2;
+}
+
+message ResumeSessionResponse {
+  bool Success = 1;
+  string Message = 2;
+  int32 PlayerId = 3;
+  string SessionToken = 4;
+  bool IsInLobby = 5;
+  bool IsInGame = 6;
+  int32 SlotIndex = 7; // csharp_default=-1
+  int32 PlayerCount = 8;
+  string GameMode = 9;
+  string SceneName = 10;
+}
+
+message RegisterRequest {
+  string Username = 1;
+  string Password = 2;
+}
+
+message RegisterResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message PlayerMove {
+  int32 PlayerId = 1;
+  float PosX = 2;
+  float PosY = 3;
+  float PosZ = 4;
+}
+
+message HeartbeatRequest {
+  int64 ClientTimestamp = 1;
+  int32 Sequence = 2;
+}
+
+message HeartbeatResponse {
+  int64 ClientTimestamp = 1;
+  int64 ServerTimestamp = 2;
+  int32 Sequence = 3;
+}
+
+message UdpBindRequest {
+  int32 PlayerId = 1;
+  string SessionToken = 2;
+}
+
+message UdpBindResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message LogoutRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+}
+
+message LogoutResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message RoomPlayerInfo {
+  int32 PlayerId = 1;
+  string Username = 2;
+  bool IsReady = 3;
+  bool IsHost = 4;
+  string SelectedBallId = 5;
+}
+
+message EnterRoomRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+}
+
+message EnterRoomResponse {
+  bool Success = 1;
+  string Message = 2;
+  repeated RoomPlayerInfo Players = 3;
+  string GameMode = 4;
+}
+
+message RoomStateUpdate {
+  repeated RoomPlayerInfo Players = 1;
+  bool GameCanStart = 2;
+  string GameMode = 3;
+}
+
+message ToggleReadyRequest {
+  int32 PlayerId = 1;
+  bool Ready = 2;
+}
+
+message ToggleReadyResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message StartGameRequest {
+  int32 PlayerId = 1;
+  string GameMode = 2;
+}
+
+message StartGameResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message SelectGameModeRequest {
+  int32 PlayerId = 1;
+  string GameMode = 2;
+}
+
+message SelectGameModeResponse {
+  bool Success = 1;
+  string Message = 2;
+  string GameMode = 3;
+}
+
+message SelectGameThreeBallRequest {
+  int32 PlayerId = 1;
+  string BallId = 2;
+}
+
+message SelectGameThreeBallResponse {
+  bool Success = 1;
+  string Message = 2;
+  string BallId = 3;
+}
+
+message GameThreeBallSelectionEntry {
+  int32 PlayerId = 1;
+  string BallId = 2;
+}
+
+message GameThreeBallSelectionStateUpdate {
+  repeated GameThreeBallSelectionEntry Selections = 1;
+}
+
+message LobbyRoomInfo {
+  string RoomId = 1;
+  string RoomName = 2;
+  string GameMode = 3;
+  int32 PlayerCount = 4;
+  int32 MaxPlayers = 5;
+  bool IsPrivate = 6;
+}
+
+message PartyMemberInfo {
+  int32 PlayerId = 1;
+  string Username = 2;
+  bool IsLeader = 3;
+}
+
+message PartyInfo {
+  string PartyId = 1;
+  string JoinCode = 2;
+  repeated PartyMemberInfo Members = 3;
+}
+
+message LobbySnapshotRequest {
+  int32 PlayerId = 1;
+}
+
+message LobbySnapshotResponse {
+  bool Success = 1;
+  string Message = 2;
+  repeated LobbyRoomInfo Rooms = 3;
+  PartyInfo Party = 4;
+  bool IsMatchmaking = 5;
+  int32 QueuePosition = 6;
+}
+
+message CreateRoomRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+  string RoomName = 3;
+  string GameMode = 4;
+  bool IsPrivate = 5;
+  string JoinCode = 6;
+}
+
+message CreateRoomResponse {
+  bool Success = 1;
+  string Message = 2;
+  string RoomId = 3;
+  string JoinCode = 4;
+}
+
+message JoinRoomRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+  string RoomId = 3;
+  string JoinCode = 4;
+}
+
+message JoinRoomResponse {
+  bool Success = 1;
+  string Message = 2;
+  string RoomId = 3;
+}
+
+message LeaveRoomRequest {
+  int32 PlayerId = 1;
+}
+
+message LeaveRoomResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message MatchmakingJoinRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+  string GameMode = 3;
+}
+
+message MatchmakingJoinResponse {
+  bool Success = 1;
+  string Message = 2;
+  bool MatchFound = 3;
+  string RoomId = 4;
+  int32 QueuePosition = 5;
+}
+
+message MatchmakingCancelRequest {
+  int32 PlayerId = 1;
+}
+
+message MatchmakingCancelResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message PartyCreateRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+}
+
+message PartyCreateResponse {
+  bool Success = 1;
+  string Message = 2;
+  PartyInfo Party = 3;
+}
+
+message PartyJoinRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+  string JoinCode = 3;
+}
+
+message PartyJoinResponse {
+  bool Success = 1;
+  string Message = 2;
+  PartyInfo Party = 3;
+}
+
+message PartyLeaveRequest {
+  int32 PlayerId = 1;
+}
+
+message PartyLeaveResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message LobbyStateUpdate {
+  repeated LobbyRoomInfo Rooms = 1;
+  PartyInfo Party = 2;
+  bool IsMatchmaking = 3;
+  int32 QueuePosition = 4;
+  bool MatchFound = 5;
+  string RoomId = 6;
+}
+
+message GameStartNotification {
+  bool Success = 1;
+  string Message = 2;
+  int32 YourSlotIndex = 3;
+  string GameMode = 4;
+  string SceneName = 5;
+}
+
+// GamePlayThree: server-authoritative 3D ball territory match. The map is
+// rendered in 3D by clients, but ownership, combat and pickups are resolved
+// against the X/Z grid carried by the state snapshot.
+message GameThreeGridCell {
+  int32 GridX = 1;
+  int32 GridZ = 2;
+}
+
+message GameThreePlayerState {
+  int32 PlayerId = 1;
+  int32 SlotIndex = 2;
+  bool IsAi = 3;
+  string BallId = 4;
+  float PositionX = 5;
+  float PositionY = 6;
+  float PositionZ = 7;
+  bool IsAlive = 8;
+  int32 CurrentHealth = 9;
+  int32 MaxHealth = 10;
+  int32 TerritoryCount = 11;
+  float SkillCooldownRemaining = 12;
+  int32 ActivePowerUpType = 13;
+  float PowerUpRemaining = 14;
+  float ShieldRemaining = 15;
+  float VelocityX = 16;
+  float VelocityY = 17;
+  float VelocityZ = 18;
+  int32 Energy = 19;
+  int32 EnergyRequired = 20;
+  float BombCooldownRemaining = 21;
+  float DashCooldownRemaining = 22;
+  float ActiveSkillRemaining = 23;
+  string ActiveSkillId = 24;
+  int32 LastProcessedInputSequence = 25;
+  float EffectiveMoveSpeed = 26;
+  bool IsTimeStopped = 27;
+  float ShiftBoostCharge = 28;
+  bool IsShiftBoosting = 29;
+  bool IsUnstoppable = 30;
+  float Imbalance = 31;
+  int32 CombatLayer = 32;
+  int32 KillRewardType = 33;
+  float KillRewardRemaining = 34;
+  bool IsConcealed = 35;
+  int32 OverchargeShotsRemaining = 36;
+  float OverchargeRemaining = 37;
+  int32 TwinShotShotsRemaining = 38;
+  int32 FreeSkillCharges = 39;
+  float TerritoryPulseRemaining = 40;
+  bool AegisCoreReady = 41;
+  bool EchoCoreReady = 42;
+  bool TemporalAnchorReady = 43;
+  bool StormCoreReady = 44;
+  float StormCoreRemaining = 45;
+}
+
+message GameThreeBombState {
+  int32 BombId = 1;
+  int32 OwnerSlot = 2;
+  float OriginX = 3;
+  float OriginZ = 4;
+  float TargetX = 5;
+  float TargetZ = 6;
+  float TimeRemaining = 7;
+}
+
+message GameThreePickupState {
+  int32 PickupId = 1;
+  int32 PickupType = 2;
+  int32 GridX = 3;
+  int32 GridZ = 4;
+  float TimeRemaining = 5;
+}
+
+message GameThreeObstacleState {
+  int32 GridX = 1;
+  int32 GridZ = 2;
+  bool IsDestructible = 3;
+}
+
+message GameThreeInput {
+  int32 PlayerId = 1;
+  float MoveX = 2;
+  float MoveZ = 3;
+  // Reserved for protocol compatibility. Normal jumping was removed.
+  bool Jump = 4;
+  int32 Sequence = 5;
+  float DeltaTime = 6;
+  bool Fire = 7;
+  bool Boost = 8;
+  float AimX = 9;
+  float AimZ = 10;
+}
+
+message GameThreeThrowBombRequest {
+  int32 PlayerId = 1;
+  float DirectionX = 2;
+  float DirectionZ = 3;
+  int32 Sequence = 4;
+}
+
+message GameThreeUseSkillRequest {
+  int32 PlayerId = 1;
+  float DirectionX = 2;
+  float DirectionZ = 3;
+  int32 Sequence = 4;
+}
+
+// Universal movement ability. Every ball has this in addition to its own
+// energy-gated skill. The server validates sequence and cooldown.
+message GameThreeDashRequest {
+  int32 PlayerId = 1;
+  float DirectionX = 2;
+  float DirectionZ = 3;
+  int32 Sequence = 4;
+}
+
+// Cancels the pre-match BallSelection scene for every participant. This is
+// handled by the lobby/gateway before a GameThreeSession exists.
+message GameThreeCancelBallSelectionRequest {
+  int32 PlayerId = 1;
+}
+
+message GameThreeStateSync {
+  repeated GameThreePlayerState Players = 1;
+  repeated GameThreeBombState Bombs = 2;
+  repeated int32 TerritoryGrid = 3;
+  repeated GameThreePickupState Pickups = 4;
+  repeated GameThreeObstacleState Obstacles = 5;
+  float RoundTimeRemaining = 6;
+  int32 MapWidth = 7;
+  int32 MapHeight = 8;
+  int32 MapSeed = 9;
+  bool IsRecoverySnapshot = 10;
+  bool IsRoundActive = 11;
+  repeated int32 TerritoryRevisionGrid = 12;
+  repeated GameThreeCloneState Clones = 13;
+  repeated GameThreeHiddenTerritoryState HiddenTerritory = 14;
+  repeated GameThreeTileMarkerState Markers = 15;
+  int64 ServerTimestampMs = 16;
+  int32 SnapshotSequence = 17;
+  repeated GameThreeProjectileState Projectiles = 18;
+  GameThreeWeatherState Weather = 19;
+  repeated GameThreeHealingZoneState HealingZones = 20;
+  GameThreeEventState ActiveEvent = 21;
+  repeated int32 TerrainGrid = 22;
+  repeated GameThreeFrostZoneState FrostZones = 23;
+}
+
+message GameThreeFrostZoneState {
+  int32 ZoneId = 1;
+  int32 OwnerSlot = 2;
+  float PositionX = 3;
+  float PositionZ = 4;
+  float Radius = 5;
+  float RemainingSeconds = 6;
+}
+
+message GameThreeProjectileState {
+  int32 ProjectileId = 1;
+  int32 OwnerSlot = 2;
+  float PositionX = 3;
+  float PositionY = 4;
+  float PositionZ = 5;
+  float VelocityX = 6;
+  float VelocityZ = 7;
+  int32 CombatLayer = 8;
+  float Scale = 9;
+}
+
+message GameThreeWeatherState {
+  int32 WeatherType = 1;
+  float RemainingSeconds = 2;
+  float WindX = 3;
+  float WindZ = 4;
+  float LightningTargetX = 5;
+  float LightningTargetZ = 6;
+  float LightningWarningRemaining = 7;
+}
+
+message GameThreeHealingZoneState {
+  int32 ZoneId = 1;
+  int32 MinX = 2;
+  int32 MaxX = 3;
+  int32 MinZ = 4;
+  int32 MaxZ = 5;
+  int32 OwnerSlot = 6;
+  float HealPerSecond = 7;
+}
+
+message GameThreeEventState {
+  int32 EventType = 1;
+  float RemainingSeconds = 2;
+  int32 OwnerSlot = 3;
+}
+
+message GameThreeCloneState {
+  int32 CloneId = 1;
+  int32 OwnerSlot = 2;
+  float PositionX = 3;
+  float PositionZ = 4;
+}
+
+message GameThreeHiddenTerritoryState {
+  int32 GridX = 1;
+  int32 GridZ = 2;
+  int32 OwnerSlot = 3;
+}
+
+message GameThreeTileMarkerState {
+  int32 GridX = 1;
+  int32 GridZ = 2;
+  int32 OwnerSlot = 3;
+  string MarkerId = 4;
+  float TimeRemaining = 5;
+}
+
+message GameThreeRoundStart {
+  float RoundDuration = 1;
+  int32 MapWidth = 2;
+  int32 MapHeight = 3;
+  int32 MapSeed = 4;
+  repeated GameThreePlayerState Players = 5;
+  repeated GameThreeObstacleState Obstacles = 6;
+}
+
+message GameThreeBombThrown {
+  int32 BombId = 1;
+  int32 OwnerSlot = 2;
+  float OriginX = 3;
+  float OriginZ = 4;
+  float TargetX = 5;
+  float TargetZ = 6;
+  float FuseSeconds = 7;
+}
+
+message GameThreeBombExploded {
+  int32 BombId = 1;
+  int32 GridX = 2;
+  int32 GridZ = 3;
+  repeated GameThreeGridCell AffectedCells = 4;
+  repeated GameThreeGridCell DestroyedObstacles = 5;
+  int32 OwnerSlot = 6;
+}
+
+message GameThreePlayerDamaged {
+  int32 VictimSlot = 1;
+  int32 SourceSlot = 2;
+  int32 Damage = 3;
+  int32 RemainingHealth = 4;
+}
+
+message GameThreePlayerDeath {
+  int32 PlayerSlot = 1;
+  int32 KillerSlot = 2;
+}
+
+message GameThreeTileClaimed {
+  int32 GridX = 1;
+  int32 GridZ = 2;
+  int32 OwnerSlot = 3;
+  int32 Revision = 4;
+  bool IsHidden = 5;
+}
+
+message GameThreePickupSpawned {
+  GameThreePickupState Pickup = 1;
+}
+
+message GameThreePickupCollected {
+  int32 PickupId = 1;
+  int32 CollectorSlot = 2;
+  int32 PickupType = 3;
+  int32 CurrentHealth = 4;
+  float SkillCooldownRemaining = 5;
+}
+
+message GameThreeSkillUsed {
+  int32 PlayerSlot = 1;
+  string SkillId = 2;
+  float TargetX = 3;
+  float TargetZ = 4;
+}
+
+message GameThreeGameOver {
+  int32 WinnerSlot = 1;
+  repeated int32 TerritoryScores = 2;
+  string Reason = 3;
+  repeated GameThreeMatchPlayerResult Results = 4;
+}
+
+message GameThreeMatchPlayerResult {
+  int32 Rank = 1;
+  int32 SlotIndex = 2;
+  int32 PlayerId = 3;
+  string BallId = 4;
+  int32 TerritoryCount = 5;
+  int32 CurrentHealth = 6;
+  int32 MaxHealth = 7;
+  bool IsAlive = 8;
+}
+
+message GameThreeLeaveGame {
+  int32 PlayerId = 1;
+}
+
+message GameThreeLeaveGameResponse {
+  bool Success = 1;
+  string Message = 2;
+}

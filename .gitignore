@@ -1,0 +1,26 @@
+.env
+Server/MyServer/appsettings.LlmAi.local.json
+Server/MyServer/appsettings.Lan.local.json
+Client/[Ll]ibrary/
+Client/[Tt]emp/
+Client/[Oo]bj/
+Client/[Ll]ogs/
+Server/**/bin/
+Server/**/obj/
+
+# Local build, verification, and generated release output.
+/.build/
+/.int/
+/.obj/
+/.tmp/
+/BuildLogs/
+/BuildVerifyOutput/
+/BuildVerifyOutput2/
+/ClientBuild/
+/Delivery/
+/.cleanup_archive_20260901/
+/.legacy_archive_20260901/
+
+# Unity/HybridCLR generated native and stripped assemblies.
+Client/HybridCLRData/StrippedAOTDllsTempProj/
+Client/HybridCLRData/LocalIl2CppData-WindowsEditor/

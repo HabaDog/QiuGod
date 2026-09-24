@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../GameNetworkCommon/GameNetworkCommon.csproj" />
+  <Project Path="MyServer.csproj" />
+</Solution>

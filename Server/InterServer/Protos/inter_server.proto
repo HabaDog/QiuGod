@@ -1,0 +1,454 @@
+syntax = "proto3";
+
+package mydemo.inter_server;
+
+option csharp_namespace = "MyDemo.InterServer";
+
+// ============================================================
+// 服务间通信协议 - Gateway + Lobby + Match + GameServer
+// ============================================================
+
+// --- Lobby Service (hosted by MyLobby) ---
+// Gateway 调用 Lobby 处理房间/准备/选球/开始等逻辑
+service LobbyService {
+  rpc CreateRoom(CreateRoomRequest) returns (CreateRoomResponse);
+  rpc JoinRoom(JoinRoomRequest) returns (JoinRoomResponse);
+  rpc LeaveRoom(LeaveRoomRequest) returns (LeaveRoomResponse);
+  rpc EnterRoom(EnterRoomRequest) returns (EnterRoomResponse);
+  rpc ToggleReady(ToggleReadyRequest) returns (ToggleReadyResponse);
+  rpc SelectGameMode(SelectGameModeRequest) returns (SelectGameModeResponse);
+  rpc SelectBall(SelectBallRequest) returns (SelectBallResponse);
+  rpc StartGame(StartGameRequest) returns (StartGameResponse);
+  rpc CancelBallSelection(CancelBallSelectionRequest) returns (CancelBallSelectionResponse);
+  rpc GetLobbySnapshot(LobbySnapshotRequest) returns (LobbySnapshotResponse);
+  rpc GetRoomSnapshot(RoomSnapshotRequest) returns (RoomSnapshotResponse);
+  rpc CreateParty(CreatePartyRequest) returns (CreatePartyResponse);
+  rpc JoinParty(JoinPartyRequest) returns (JoinPartyResponse);
+  rpc LeaveParty(LeavePartyRequest) returns (LeavePartyResponse);
+  rpc RemovePlayer(RemovePlayerRequest) returns (RemovePlayerResponse);
+  rpc ResetReadyStates(ResetReadyRequest) returns (ResetReadyResponse);
+  rpc SetReturnDestination(SetReturnDestinationRequest) returns (SetReturnDestinationResponse);
+}
+
+// --- Match Service (hosted by MyMatch) ---
+// Gateway 调用 Match 处理匹配队列
+service MatchService {
+  rpc JoinQueue(MatchJoinRequest) returns (MatchJoinResponse);
+  rpc CancelQueue(MatchCancelRequest) returns (MatchCancelResponse);
+  // Server streaming: 匹配成功后推送结果
+  rpc WatchMatch(WatchMatchRequest) returns (stream MatchFoundEvent);
+  rpc GetQueueStatus(QueueStatusRequest) returns (QueueStatusResponse);
+}
+
+// --- Game Service (hosted by MyGameServer) ---
+// Gateway 调用 GameServer 管理游戏会话
+service GameService {
+  rpc CreateSession(CreateGameSessionRequest) returns (CreateGameSessionResponse);
+  rpc StopSession(StopGameSessionRequest) returns (StopGameSessionResponse);
+  rpc ForwardPlayerInput(ForwardPlayerInputRequest) returns (ForwardPlayerInputResponse);
+  // Server streaming: 订阅游戏状态快照
+  rpc SubscribeGameState(GameStateSubscription) returns (stream GameStateBroadcast);
+  rpc GetResumeState(GetResumeStateRequest) returns (GetResumeStateResponse);
+}
+
+// --- Gateway Callback Service (hosted by MyGateway) ---
+// Lobby/Match/GameServer 回调 Gateway 进行广播
+service GatewayCallback {
+  rpc BroadcastRoomState(BroadcastRoomStateRequest) returns (BroadcastAck);
+  rpc BroadcastLobbyState(BroadcastLobbyStateRequest) returns (BroadcastAck);
+  rpc BroadcastSceneNotification(BroadcastSceneNotificationRequest) returns (BroadcastAck);
+  rpc BroadcastBallSelectionState(BroadcastBallSelectionStateRequest) returns (BroadcastAck);
+  rpc NotifyMatchFound(NotifyMatchFoundRequest) returns (BroadcastAck);
+  rpc BroadcastGamePacket(BroadcastGamePacketRequest) returns (BroadcastAck);
+  rpc NotifySessionCompleted(NotifySessionCompletedRequest) returns (BroadcastAck);
+}
+
+// ============================================================
+// Common types
+// ============================================================
+
+message BroadcastAck {
+  bool Success = 1;
+}
+
+message RoomPlayer {
+  int32 PlayerId = 1;
+  string Username = 2;
+  bool IsReady = 3;
+  bool IsHost = 4;
+  string SelectedBallId = 5;
+}
+
+message LobbyRoomInfo {
+  string RoomId = 1;
+  string RoomName = 2;
+  string GameMode = 3;
+  int32 PlayerCount = 4;
+  int32 MaxPlayers = 5;
+  bool IsPrivate = 6;
+}
+
+message PartyMember {
+  int32 PlayerId = 1;
+  string Username = 2;
+  bool IsLeader = 3;
+}
+
+message PartyInfo {
+  string PartyId = 1;
+  string JoinCode = 2;
+  repeated PartyMember Members = 3;
+}
+
+// ============================================================
+// Lobby Service messages
+// ============================================================
+
+message CreateRoomRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+  string RoomName = 3;
+  string GameMode = 4;
+  bool IsPrivate = 5;
+  string JoinCode = 6;
+}
+
+message CreateRoomResponse {
+  bool Success = 1;
+  string Message = 2;
+  string RoomId = 3;
+  string JoinCode = 4;
+}
+
+message JoinRoomRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+  string RoomId = 3;
+  string JoinCode = 4;
+}
+
+message JoinRoomResponse {
+  bool Success = 1;
+  string Message = 2;
+  string RoomId = 3;
+}
+
+message LeaveRoomRequest {
+  int32 PlayerId = 1;
+}
+
+message LeaveRoomResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message EnterRoomRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+}
+
+message EnterRoomResponse {
+  bool Success = 1;
+  string Message = 2;
+  repeated RoomPlayer Players = 3;
+  string GameMode = 4;
+}
+
+message ToggleReadyRequest {
+  int32 PlayerId = 1;
+  bool Ready = 2;
+}
+
+message ToggleReadyResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message SelectGameModeRequest {
+  int32 PlayerId = 1;
+  string GameMode = 2;
+}
+
+message SelectGameModeResponse {
+  bool Success = 1;
+  string Message = 2;
+  string GameMode = 3;
+}
+
+message SelectBallRequest {
+  int32 PlayerId = 1;
+  string BallId = 2;
+}
+
+message SelectBallResponse {
+  bool Success = 1;
+  string Message = 2;
+  string BallId = 3;
+  bool AllConfirmed = 4;
+  repeated int32 PlayerIds = 5;
+  string GameMode = 6;
+  string ReturnSceneName = 7;
+  map<int32, string> BallSelections = 8;
+}
+
+message StartGameRequest {
+  int32 PlayerId = 1;
+  string GameMode = 2;
+}
+
+message StartGameResponse {
+  bool Success = 1;
+  string Message = 2;
+  repeated int32 PlayerIds = 3;
+  string GameMode = 4;
+  map<int32, string> BallSelections = 5;
+  bool NeedsBallSelection = 6;
+  string ReturnSceneName = 7;
+}
+
+message CancelBallSelectionRequest {
+  int32 PlayerId = 1;
+}
+
+message CancelBallSelectionResponse {
+  bool Success = 1;
+  string Message = 2;
+  repeated int32 AffectedPlayerIds = 3;
+  string GameMode = 4;
+  string ReturnSceneName = 5;
+}
+
+message LobbySnapshotRequest {
+  int32 PlayerId = 1;
+}
+
+message LobbySnapshotResponse {
+  bool Success = 1;
+  string Message = 2;
+  repeated LobbyRoomInfo Rooms = 3;
+  PartyInfo Party = 4;
+  bool IsMatchmaking = 5;
+  int32 QueuePosition = 6;
+}
+
+message RoomSnapshotRequest {
+  int32 PlayerId = 1;
+}
+
+message RoomSnapshotResponse {
+  bool Success = 1;
+  string Message = 2;
+  repeated RoomPlayer Players = 3;
+  string GameMode = 4;
+  bool CanStart = 5;
+}
+
+message CreatePartyRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+}
+
+message CreatePartyResponse {
+  bool Success = 1;
+  string Message = 2;
+  PartyInfo Party = 3;
+}
+
+message JoinPartyRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+  string JoinCode = 3;
+}
+
+message JoinPartyResponse {
+  bool Success = 1;
+  string Message = 2;
+  PartyInfo Party = 3;
+}
+
+message LeavePartyRequest {
+  int32 PlayerId = 1;
+}
+
+message LeavePartyResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message RemovePlayerRequest {
+  int32 PlayerId = 1;
+}
+
+message RemovePlayerResponse {
+  bool Success = 1;
+  string Message = 2;
+  repeated int32 AffectedPlayerIds = 3;
+  bool BallSelectionCleared = 4;
+  string GameMode = 5;
+  string ReturnSceneName = 6;
+}
+
+message ResetReadyRequest {
+  int32 PlayerId = 1;
+}
+
+message ResetReadyResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message SetReturnDestinationRequest {
+  int32 PlayerId = 1;
+  string SceneName = 2;
+}
+
+message SetReturnDestinationResponse {
+  bool Success = 1;
+}
+
+// ============================================================
+// Match Service messages
+// ============================================================
+
+message MatchJoinRequest {
+  int32 PlayerId = 1;
+  string Username = 2;
+  string GameMode = 3;
+}
+
+message MatchJoinResponse {
+  bool Success = 1;
+  string Message = 2;
+  bool MatchFound = 3;
+  string RoomId = 4;
+  int32 QueuePosition = 5;
+}
+
+message MatchCancelRequest {
+  int32 PlayerId = 1;
+}
+
+message MatchCancelResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message WatchMatchRequest {
+  int32 PlayerId = 1;
+}
+
+message MatchFoundEvent {
+  repeated int32 PlayerIds = 1;
+  string RoomId = 2;
+  string GameMode = 3;
+}
+
+message QueueStatusRequest {
+  int32 PlayerId = 1;
+}
+
+message QueueStatusResponse {
+  bool InQueue = 1;
+  int32 QueuePosition = 2;
+  int32 EstimatedWaitSeconds = 3;
+}
+
+// ============================================================
+// Game Service messages
+// ============================================================
+
+message CreateGameSessionRequest {
+  repeated int32 PlayerIds = 1;
+  string GameMode = 2;
+  map<int32, string> BallSelections = 3;
+}
+
+message CreateGameSessionResponse {
+  bool Success = 1;
+  string Message = 2;
+  string SessionId = 3;
+  string SceneName = 4;
+  map<int32, int32> SlotIndices = 5; // PlayerId -> SlotIndex
+}
+
+message StopGameSessionRequest {
+  int32 PlayerId = 1;
+}
+
+message StopGameSessionResponse {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message ForwardPlayerInputRequest {
+  int32 PlayerId = 1;
+  bytes PacketData = 2; // 原始 BaseMessage 二进制数据
+}
+
+message ForwardPlayerInputResponse {
+  bool Success = 1;
+}
+
+message GameStateSubscription {
+  string SessionId = 1;
+  int32 PlayerId = 2;
+}
+
+message GameStateBroadcast {
+  repeated int32 PlayerIds = 1;
+  bytes PacketData = 2; // 原始 BaseMessage 二进制数据
+}
+
+message GetResumeStateRequest {
+  int32 PlayerId = 1;
+}
+
+message GetResumeStateResponse {
+  bool HasActiveSession = 1;
+  string SessionId = 2;
+  string SceneName = 3;
+  int32 SlotIndex = 4;
+  int32 PlayerCount = 5;
+  string GameMode = 6;
+  bytes SnapshotPacket = 7; // 恢复快照
+}
+
+// ============================================================
+// Gateway Callback messages
+// ============================================================
+
+message BroadcastRoomStateRequest {
+  repeated int32 PlayerIds = 1;
+  bytes RoomStateData = 2; // RoomStateUpdate protobuf bytes
+}
+
+message BroadcastLobbyStateRequest {
+  bytes LobbyStateData = 1; // LobbyStateUpdate protobuf bytes
+}
+
+message BroadcastSceneNotificationRequest {
+  repeated int32 PlayerIds = 1;
+  string GameMode = 2;
+  string SceneName = 3;
+}
+
+message BroadcastBallSelectionStateRequest {
+  repeated int32 PlayerIds = 1;
+  bytes SelectionStateData = 2; // GameThreeBallSelectionStateUpdate protobuf bytes
+}
+
+message NotifyMatchFoundRequest {
+  repeated int32 PlayerIds = 1;
+  string RoomId = 2;
+  string GameMode = 3;
+}
+
+message BroadcastGamePacketRequest {
+  repeated int32 PlayerIds = 1;
+  bytes PacketData = 2; // 原始游戏状态数据
+}
+
+message NotifySessionCompletedRequest {
+  repeated int32 PlayerIds = 1;
+  string GameMode = 2;
+}

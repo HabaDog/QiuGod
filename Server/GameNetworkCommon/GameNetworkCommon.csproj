@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="protobuf-net" Version="3.2.56" />
+  </ItemGroup>
+
+  <Target Name="GenerateSharedProtocol" BeforeTargets="CoreCompile" Condition="'$(SkipProtocolGeneration)' != 'true'">
+    <Exec Command="dotnet run --project &quot;$(MSBuildThisFileDirectory)..\..\Shared\Protocol\ProtocolGenerator\ProtocolGenerator.csproj&quot; -- &quot;$(MSBuildThisFileDirectory)..\..\Shared\Protocol\game_messages.proto&quot; &quot;$(MSBuildThisFileDirectory)..\..\Client\Assets\Scripts\Network\Common&quot;" />
+  </Target>
+
+  <ItemGroup>
+    <!-- Generated from Shared/Protocol/game_messages.proto before compile. -->
+    <Compile Remove="BaseMessage.cs" />
+    <Compile Remove="GameMessages.cs" />
+    <Compile Remove="Protocols.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\Network\Common\BaseMessage.cs" Link="BaseMessage.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\Network\Common\GameMessages.cs" Link="GameMessages.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\Network\Common\MessageFrameDecoder.cs" Link="MessageFrameDecoder.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\Network\Common\GameThreeKinematicMotion.cs" Link="GameThreeKinematicMotion.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\Network\Common\Protocols.cs" Link="Protocols.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\Network\Common\GameThreeBallCatalogData.cs" Link="GameThreeBallCatalogData.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\Network\Common\GameThreeAbilityCatalogData.cs" Link="GameThreeAbilityCatalogData.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\Network\Common\GameThreeMatchBalanceData.cs" Link="GameThreeMatchBalanceData.cs" />
+    <Compile Include="..\..\Client\Assets\Scripts\Network\Common\GameThreePowerUpCatalogData.cs" Link="GameThreePowerUpCatalogData.cs" />
+  </ItemGroup>
+
+</Project>

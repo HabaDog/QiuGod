@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+    <!-- 保留protobuf-net需要的反射类型，解决IL2CPP兼容性问题 -->
+    <!-- 这是解决 RuntimeParameterInfo::GetTypeModifiers 错误的关键配置 -->
+    
+    <!-- 保留System.Reflection相关程序集 -->
+    <assembly fullname="System.Reflection" preserve="all"/>
+    <assembly fullname="System.Reflection.Extensions" preserve="all"/>
+    <assembly fullname="System.Reflection.Primitives" preserve="all"/>
+    
+    <!-- 保留mscorlib中的反射类型 -->
+    <assembly fullname="mscorlib">
+        <type fullname="System.Reflection.RuntimeParameterInfo" preserve="all"/>
+        <type fullname="System.Reflection.ParameterInfo" preserve="all"/>
+        <type fullname="System.Reflection.MonoParameter" preserve="all"/>
+        <type fullname="System.Reflection.RuntimeMethodInfo" preserve="all"/>
+        <type fullname="System.Reflection.MethodInfo" preserve="all"/>
+        <type fullname="System.Reflection.RuntimePropertyInfo" preserve="all"/>
+        <type fullname="System.Reflection.PropertyInfo" preserve="all"/>
+        <type fullname="System.Reflection.RuntimeFieldInfo" preserve="all"/>
+        <type fullname="System.Reflection.FieldInfo" preserve="all"/>
+        <type fullname="System.Reflection.RuntimeType" preserve="all"/>
+        <type fullname="System.Type" preserve="all"/>
+    </assembly>
+    
+    <!-- 保留protobuf-net程序集 -->
+    <assembly fullname="protobuf-net" preserve="all"/>
+    <assembly fullname="protobuf-net.Core" preserve="all"/>
+    
+    <!-- 保留GameNetworkCommon命名空间下的所有类型 -->
+    <assembly fullname="GameNetworkCommon" preserve="all"/>
+    
+    <!-- 保留Assembly-CSharp中的所有类型（包含所有游戏脚本） -->
+    <assembly fullname="Assembly-CSharp" preserve="all"/>
+    
+    <!-- 保留System.Collections.Generic相关类型，确保List<T>等泛型集合正常工作 -->
+    <assembly fullname="System.Collections" preserve="all"/>
+    <assembly fullname="System" preserve="all">
+        <type fullname="System.Collections.Generic.List`1" preserve="all"/>
+        <type fullname="System.Collections.Generic.List`1[[GameNetworkCommon.RoomPlayerInfo, GameNetworkCommon]]" preserve="all"/>
+    </assembly>
+</linker>
+

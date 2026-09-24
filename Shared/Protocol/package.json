@@ -1,0 +1,7 @@
+{
+  "name": "com.mydemo.protocol",
+  "displayName": "MyDemo Protocol",
+  "version": "0.1.0",
+  "unity": "2022.3",
+  "description": "Shared Protobuf network contracts compiled by both the Unity client and .NET server."
+}
