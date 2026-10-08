@@ -7,6 +7,10 @@ Client/[Oo]bj/
 Client/[Ll]ogs/
 Server/**/bin/
 Server/**/obj/
+HostServer/bin/
+HostServer/obj/
+Shared/Protocol/ProtocolGenerator/bin/
+Shared/Protocol/ProtocolGenerator/obj/
 
 # Local build, verification, and generated release output.
 /.build/
